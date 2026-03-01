@@ -39,7 +39,9 @@ podman exec -it gemma-translator ollama pull gemma3:12b
 pip install ollama
 ```
 
-Create translate_i18n.py
+# Create translate_i18n.py
+Change SOURCE_FILE to to the local file path of your intended file to translate  
+Change TARGET_LANGS as required
 ```
 import json
 import ollama
@@ -109,4 +111,11 @@ podman exec -it gemma-translator ollama pull gemma3:27b-it-q4_K_M
 # Start Podman
 ```
 podman start gemma-translator
+```
+
+# Run the .py file
+In your konsole
+```
+cd ./file_location/
+python translate_i18n.py
 ```
