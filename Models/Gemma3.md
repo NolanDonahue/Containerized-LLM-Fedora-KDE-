@@ -1,0 +1,99 @@
+# Pull the Model
+I am using Gemma 3
+```
+podman exec -it gemma-translator ollama pull gemma3:12b
+```
+
+# Using Gemma 3 for Translations
+
+```
+pip install ollama
+```
+
+# Create translate_i18n.py
+Change SOURCE_FILE to to the local file path of your intended file to translate  
+Change TARGET_LANGS as required
+```
+import json
+import ollama
+
+# --- CONFIG ---
+SOURCE_FILE = 'en-US.json'
+TARGET_LANGS = ['es-ES', 'fr-FR']
+MODEL = 'gemma3:12b'
+# 'es-ES' Spanish
+# 'fr-FR' French
+# 'nl-NL' Dutch, Netherlands
+# 'pt-BR' Portuguese, Brazil
+# 'pl-PL' Polish
+# 'ru-RU' Russian
+# 'de-DE' German
+
+def translate_text(text, target_lang):
+    """Sends a single string to the containerized Gemma 3."""
+    if not text or not isinstance(text, str):
+        return text
+
+    prompt = f"""Translate the following UI string into {target_lang}.
+    - Preserve all placeholders like {{name}}, {{count}}, or %s.
+    - Maintain the tone (formal/informal) of the original.
+    - Output ONLY the translated text.
+    
+    English: {text}"""
+
+    try:
+        response = ollama.generate(model=MODEL, prompt=prompt)
+        return response['response'].strip().strip('"')
+    except Exception as e:
+        print(f"Error translating '{text}': {e}")
+        return text
+
+def recursive_translate(data, target_lang):
+    """Walks through the JSON tree recursively."""
+    if isinstance(data, dict):
+        # If it's a dictionary, translate all its values
+        return {k: recursive_translate(v, target_lang) for k, v in data.items()}
+    elif isinstance(data, list):
+        # If it's a list (e.g., an array of strings), translate each item
+        return [recursive_translate(item, target_lang) for item in data]
+    elif isinstance(data, str):
+        # Base case: it's a string, translate it
+        print(f"  Translating: {data[:30]}...")
+        return translate_text(data, target_lang)
+    else:
+        # Return numbers/booleans as they are
+        return data
+
+def main():
+    with open(SOURCE_FILE, 'r', encoding='utf-8') as f:
+        source_data = json.load(f)
+
+    for lang in TARGET_LANGS:
+        print(f"\n--- Starting Translation for {lang} ---")
+        translated_data = recursive_translate(source_data, lang)
+        
+        output_file = f"{lang}.json"
+        with open(output_file, 'w', encoding='utf-8') as f:
+            json.dump(translated_data, f, indent=2, ensure_ascii=False)
+        print(f"Finished! Saved to {output_file}")
+
+if __name__ == "__main__":
+    main()
+```
+
+# If you want to push some of the load onto RAM beyond the 16GB VRAM
+```
+podman exec -it gemma-translator ollama pull gemma3:27b-it-q4_K_M
+```
+
+# Start Podman
+```
+podman start gemma-translator
+```
+
+# Run the .py file
+In your konsole
+```
+cd ./file_location/
+python translate_i18n.py
+```
