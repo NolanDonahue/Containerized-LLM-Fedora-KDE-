@@ -1,4 +1,16 @@
 # Qwen 2.5-Coder 32 (Q4) for Code Analysis
-```
+sudo usermod -a -G video,render $USER
+sudo setsebool -P container_use_devices true
+podman run -d \
+  --name qwen-coder \
+  --device /dev/kfd \
+  --device /dev/dri \
+  -v ollama_data:/root/.ollama \
+  -p 11434:11434 \
+  -e HSA_OVERRIDE_GFX_VERSION=11.0.0 \
+  docker.io/ollama/ollama:rocm
+podman exec -it qwen-coder ollama pull qwen2.5-coder:32b
+podman run qwen2.5-coder:32b-instruct-q4_K_M
 
+podman start qwen-coder
 ```
