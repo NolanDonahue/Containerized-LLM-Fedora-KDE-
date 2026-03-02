@@ -10,7 +10,7 @@ podman run -d \
   -e HSA_OVERRIDE_GFX_VERSION=11.0.0 \
   docker.io/ollama/ollama:rocm
 podman exec -it qwen-coder ollama pull qwen2.5-coder:32b
-podman run qwen2.5-coder:32b-instruct-q4_K_M
+podman exec -it qwen-coder ollama pull qwen2.5-coder:32b
 
 podman start qwen-coder
 ```
