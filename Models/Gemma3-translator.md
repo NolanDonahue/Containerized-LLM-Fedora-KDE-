@@ -1,5 +1,5 @@
 # Pull the Model
-I am using Gemma 3
+I am using Gemma 3 for fast translations
 ```
 podman exec -it gemma-translator ollama pull gemma3:12b
 ```
