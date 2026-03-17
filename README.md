@@ -11,6 +11,97 @@ podman run -d \
   -e OLLAMA_VULKAN=1 \
   docker.io/ollama/ollama:latest
 ```
+# Host a web interface in a separate podman container to be more pleasant to interact with the model
+```
+podman run -d \
+  --name open-webui \
+  -p 3000:8080 \
+  --add-host=host.containers.internal:host-gateway \
+  -v open-webui-data:/app/backend/data \
+  -e OLLAMA_BASE_URL=http://host.containers.internal:11434 \
+  ghcr.io/open-webui/open-webui:main
+```
+# Pull a model for local storage so you don't download it every time. I'm using glm-4.7-flash for 24gb VRAM (16gb 7800xt, 8gb 6600)
+```
+podman exec -it ollama-vulkan pull glm-47-flash
+```
+# Open the web interface at http://localhost:3000
+
+# Use Roo Code to run the local model in VS Code for code assist
+- Download the Roo Code extension in VS Code
+- Navigate to roo in the sidebar
+- Select settings (gear icon)
+- Select ollama for API provider
+- Base URL: http://localhost:11434
+- Model ID: (in my case) glm-4.7-flash
+- Context Window: 8192 or 16384 (upper limit for 24GB VRAM so you don't out of memory)
+
+.rooignore for VS Code workspace
+```
+# .rooignore - Prevent Roo Code from blowing up LLM context
+
+# Version Control
+.git/
+
+# Dependencies & Virtual Environments
+node_modules/
+vendor/
+venv/
+.venv/
+env/
+.env
+
+# Build Outputs & Compiled Binaries
+dist/
+build/
+out/
+target/
+bin/
+obj/
+*.class
+*.dll
+*.exe
+*.so
+*.o
+
+# Large Media & Assets
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico
+*.mp4
+*.mp3
+*.wav
+*.svg
+
+# Large Data & Log Files
+*.log
+*.sql
+*.sqlite
+*.db
+*.csv
+*.tsv
+*.parquet
+*.jsonl
+
+# Lockfiles (Huge context hogs, terrible for reasoning)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+poetry.lock
+Pipfile.lock
+Cargo.lock
+
+# Minified files
+*.min.js
+*.min.css
+*.bundle.js
+
+# OS specific
+.DS_Store
+Thumbs.db
+```
 
 # Containerized-LLM-Fedora-KDE-
 Using a Fedora KDE system, establish a containerized instance of an LLM. In this case, I am using mine for i18n translations with Google's Gemma 3
