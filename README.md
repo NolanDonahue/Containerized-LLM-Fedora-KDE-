@@ -1,3 +1,17 @@
+# Dual GPU Podman ollama container using Vulkan to bypass the RDNA2/RDNA3 incompatibility with ollama ROCM
+```
+podman run -d \
+  --name ollama-vulkan \
+  --device /dev/kfd --device /dev/dri \
+  --group-add keep-groups \
+  --security-opt label=disable \
+  --security-opt seccomp=unconfined \
+  -v ollama:/root/.ollama \
+  -p 11434:11434 \
+  -e OLLAMA_VULKAN=1 \
+  docker.io/ollama/ollama:latest
+```
+
 # Containerized-LLM-Fedora-KDE-
 Using a Fedora KDE system, establish a containerized instance of an LLM. In this case, I am using mine for i18n translations with Google's Gemma 3
 
