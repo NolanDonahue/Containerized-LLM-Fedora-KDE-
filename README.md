@@ -119,3 +119,44 @@ In your konsole
 cd ./file_location/
 python translate_i18n.py
 ```
+
+```
+podman run -d \
+  --name ollama-container \
+  --device /dev/kfd --device /dev/dri \
+  --group-add keep-groups \
+  --security-opt label=disable \
+  --security-opt seccomp=unconfined \
+  -v ollama:/root/.ollama \
+  -p 11434:11434 \
+  -e HSA_ENABLE_SDMA=0 \
+  -e OLLAMA_NUM_PARALLEL=4 \
+  docker.io/ollama/ollama:rocm
+```
+
+alt for if it doesn't work
+```
+podman run -d \
+  --name ollama-7800xt \
+  --device /dev/kfd --device /dev/dri \
+  --group-add keep-groups \
+  --security-opt label=disable \
+  --security-opt seccomp=unconfined \
+  -v ollama_7800:/root/.ollama \
+  -p 11434:11434 \
+  -e HIP_VISIBLE_DEVICES=0 \
+  -e HSA_ENABLE_SDMA=0 \
+  docker.io/ollama/ollama:rocm
+podman run -d \
+  --name ollama-6600 \
+  --device /dev/kfd --device /dev/dri \
+  --group-add keep-groups \
+  --security-opt label=disable \
+  --security-opt seccomp=unconfined \
+  -v ollama_6600:/root/.ollama \
+  -p 11435:11434 \
+  -e HIP_VISIBLE_DEVICES=1 \
+  -e HSA_OVERRIDE_GFX_VERSION=10.3.0 \
+  -e HSA_ENABLE_SDMA=0 \
+  docker.io/ollama/ollama:rocm
+```
